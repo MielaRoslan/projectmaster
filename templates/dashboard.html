@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+    <div class="site-section ftco-subscribe-1 site-blocks-cover pb-4" style="background-image: url({% static 'images/back1.jpg' %})">
+        <div class="container">
+          <div class="row align-items-end">
+            <div class="col-lg-7">
+              <h2 class="mb-0">Dashboard</h2>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="custom-breadcrumns border-bottom">
+      <div class="container">
+        <a href="index.html">Home</a>
+        <span class="mx-3 icon-keyboard_arrow_right"></span>
+        <span class="current">Dashboard</span>
+      </div>
+    </div>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-warning alert-dismissable" role="alert">
+                <button class="close" data-dismiss="alert">
+                  <small><sup>x</sup></small>
+                </button>
+                {{ message }}
+              </div><br/>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="site-section">
+        <div class="container" style="padding:0% 8% 0% 8%;">
+            <form action="{% url 'show_chart' %}" method="POST" class="form-inline my-2 my-lg-0">
+                {% csrf_token %}
+                <select name="term_value" class="form-control form-control-lg">
+                    <option value="choose">Choose Product Name</option>
+                    {% if terms %}
+                        {% for term in terms %}
+                            <option value="{{ term }}">{{ term }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+                <input class="btn btn-warning btn-lg px-5" type="submit" value="Show Results">
+            </form>
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+            <div class="chart-container">
+                <br><canvas id="myChart" name="barchart" class="row justify-content-center"
+                        style="display: block; width: 50%; height: 80%;"></canvas><br>
+
+                <br><canvas id="myChart1" name="barchart1" class="row justify-content-center"
+                        style="display: block; width: 50%; height: 80%;"></canvas><br>
+
+                <br><canvas id="myChart2" name="barchart2" class="row justify-content-center"
+                        style="display: block; width: 50%; height: 80%;"></canvas><br>
+
+                <br><canvas id="myChart3" name="barchart3" class="row justify-content-center"
+                        style="display: block; width: 50%; height: 80%;"></canvas><br>
+
+                <br><canvas id="myChart4" name="barchart4" class="row justify-content-center"
+                        style="display: block; width: 50%; height: 80%;"></canvas><br>
+
+                <br><canvas id="myChart5" name="barchart5" class="row justify-content-center"
+                        style="display: block; width: 50%; height: 80%;"></canvas><br>
+            </div>
+
+            <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Strongly Negative', 'Negative', 'Neutral', 'Positive', 'Strongly Positive'],
+                        datasets: [{
+                            label: 'Sentiment Analysis',
+                            data: {{ sentimentcat }},
+                            backgroundColor: [
+                                'rgba(255, 90, 132, 1)',
+                                'rgba(255, 148, 185, 1)',
+                                'rgba(0, 167, 255, 1)',
+                                'rgba(179, 252, 130, 1)',
+                                'rgba(95, 167, 50, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+
+                var ctx = document.getElementById('myChart1').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Strongly Negative', 'Negative', 'Neutral', 'Positive', 'Strongly Positive'],
+                        datasets: [{
+                            label: 'Pie Chart - Sentiment Analysis',
+                            data: {{ sentimentcat }},
+                            backgroundColor: [
+                                'rgba(255, 90, 132, 1)',
+                                'rgba(255, 148, 185, 1)',
+                                'rgba(0, 167, 255, 1)',
+                                'rgba(179, 252, 130, 1)',
+                                'rgba(95, 167, 50, 1)'
+                            ],
+
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+
+                var ctx = document.getElementById('myChart2').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: {{ hastag_words|safe }},
+                        datasets: [{
+                            label: 'Top 10 frequent Hastags',
+                            data: {{ hastag_count }},
+                            backgroundColor: 'rgba(74, 194, 255, 1)',
+
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+
+                var ctx = document.getElementById('myChart3').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: {{ cleaned_words|safe }},
+                        datasets: [{
+                            label: 'Most Common Words - Including All',
+                            data: {{ cleaned_count }},
+                            backgroundColor: 'rgba(74, 194, 255, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+
+                var ctx = document.getElementById('myChart4').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: {{ pos_cleaned_words|safe }},
+                        datasets: [{
+                            label: 'Most Common Positive Words',
+                            data: {{ pos_cleaned_count }},
+                            backgroundColor: 'rgba(95, 167, 50, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+
+                var ctx = document.getElementById('myChart5').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: {{ neg_cleaned_words|safe }},
+                        datasets: [{
+                            label: 'Most Common Negative Words',
+                            data: {{ neg_cleaned_count }},
+                            backgroundColor: 'rgba(255, 90, 132, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+
+             </script>
+        </div>
+    </div>
+
+{% endblock %}
